@@ -1,0 +1,6 @@
+{
+  "name": "Nhớ Giúp",
+  "description": "Ứng dụng nhắc việc kiên trì, danh sách trước khi ra khỏi nhà và ghi nhớ vị trí đồ vật dành cho người hay quên, kèm mã nguồn Android Kotlin/Compose hoàn chỉnh.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

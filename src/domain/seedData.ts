@@ -1,0 +1,172 @@
+import type { AppSettings, ChecklistGroup, ItemLocation, Reminder } from './types';
+import { formatLocalDate } from './voiceParser';
+
+const TODAY = formatLocalDate(new Date());
+
+export const INITIAL_SETTINGS: AppSettings = {
+  theme: 'light',
+  fontScale: 'large',
+  language: 'vi',
+  soundEnabled: true,
+  vibrationEnabled: true,
+  defaultNagIntervalMinutes: 10,
+  defaultMaxNagCount: 5,
+  quietHours: {
+    enabled: true,
+    startTime: '22:00',
+    endTime: '06:30',
+  },
+  emergencyContact: {
+    enabled: true,
+    name: 'Minh Anh',
+    relation: 'Con gái',
+    phone: '0912345678',
+    missedThreshold: 3,
+  },
+  onboardingCompleted: false,
+  permissions: {
+    notificationsGranted: true,
+    exactAlarmGranted: true,
+    batteryOptimizationIgnored: false,
+  },
+};
+
+export const INITIAL_REMINDERS: Reminder[] = [
+  {
+    id: 'rem-1',
+    title: 'Uống thuốc huyết áp buổi sáng',
+    note: '1 viên sau khi ăn sáng, uống với nước ấm',
+    time: '08:00',
+    date: TODAY,
+    repeatType: 'daily',
+    repeatDays: [1, 2, 3, 4, 5, 6, 7],
+    isImportant: true,
+    status: 'overdue',
+    nagCount: 2,
+    nagIntervalMinutes: 10,
+    maxNagCount: 5,
+    createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+  },
+  {
+    id: 'rem-2',
+    title: 'Tắt bếp và kiểm tra van ga',
+    note: 'Kiểm tra kỹ bếp trước khi đi nghỉ trưa',
+    time: '12:15',
+    date: TODAY,
+    repeatType: 'daily',
+    repeatDays: [1, 2, 3, 4, 5, 6, 7],
+    isImportant: true,
+    status: 'pending',
+    nagCount: 0,
+    nagIntervalMinutes: 10,
+    maxNagCount: 5,
+    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+  },
+  {
+    id: 'rem-3',
+    title: 'Tưới cây ngoài ban công',
+    note: 'Tưới vừa đủ cho chậu lan và cây rau thơm',
+    time: '17:30',
+    date: TODAY,
+    repeatType: 'weekdays',
+    repeatDays: [1, 3, 5],
+    isImportant: false,
+    status: 'pending',
+    nagCount: 0,
+    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+  },
+  {
+    id: 'rem-4',
+    title: 'Khóa cửa chính và rút sạc điện thoại',
+    note: 'Kiểm tra chốt cửa ban công tầng 1',
+    time: '21:30',
+    date: TODAY,
+    repeatType: 'daily',
+    repeatDays: [1, 2, 3, 4, 5, 6, 7],
+    isImportant: true,
+    status: 'pending',
+    nagCount: 0,
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    id: 'rem-5',
+    title: 'Đo đường huyết trước bữa sáng',
+    note: 'Ghi lại chỉ số vào sổ theo dõi',
+    time: '06:45',
+    date: TODAY,
+    repeatType: 'daily',
+    repeatDays: [1, 2, 3, 4, 5, 6, 7],
+    isImportant: true,
+    status: 'done',
+    nagCount: 0,
+    completedAt: new Date().toISOString(),
+    createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+  },
+];
+
+export const INITIAL_CHECKLISTS: ChecklistGroup[] = [
+  {
+    id: 'chk-work',
+    name: 'Đi làm',
+    reminderTime: '07:30',
+    reminderEnabled: true,
+    items: [
+      { id: 'cw-1', label: 'Chìa khóa nhà & xe máy', checked: true },
+      { id: 'cw-2', label: 'Ví tiền và căn cước công dân', checked: true },
+      { id: 'cw-3', label: 'Điện thoại (đã sạc pin)', checked: false },
+      { id: 'cw-4', label: 'Thẻ nhân viên / thẻ gửi xe', checked: false },
+      { id: 'cw-5', label: 'Kính mắt & hộp thuốc dự phòng', checked: false },
+    ],
+  },
+  {
+    id: 'chk-school',
+    name: 'Đi học / Đưa đón cháu',
+    reminderTime: '06:50',
+    reminderEnabled: true,
+    items: [
+      { id: 'cs-1', label: 'Mũ bảo hiểm (2 chiếc)', checked: false },
+      { id: 'cs-2', label: 'Bình nước cá nhân', checked: true },
+      { id: 'cs-3', label: 'Áo mưa gấp gọn trong cốp', checked: false },
+      { id: 'cs-4', label: 'Thẻ đón trẻ & điện thoại', checked: false },
+    ],
+  },
+  {
+    id: 'chk-travel',
+    name: 'Đi du lịch',
+    reminderTime: '06:00',
+    reminderEnabled: false,
+    items: [
+      { id: 'ct-1', label: 'CCCD / Hộ chiếu & vé xe', checked: false },
+      { id: 'ct-2', label: 'Sạc dự phòng & dây sạc', checked: false },
+      { id: 'ct-3', label: 'Thuốc uống hằng ngày đủ số ngày', checked: false },
+      { id: 'ct-4', label: 'Đã khóa van nước & tắt cầu dao phụ', checked: false },
+    ],
+  },
+];
+
+export const INITIAL_ITEM_LOCATIONS: ItemLocation[] = [
+  {
+    id: 'loc-1',
+    itemName: 'Chìa khóa nhà & xe máy',
+    location: 'Ngăn kéo trên cùng bàn làm việc gỗ sồi',
+    note: 'Chùm có thẻ da khắc chữ HOME và khóa điều khiển màu đen',
+    photoUrl: '/src/assets/images/item_house_keys_1795772703558.jpg',
+    updatedAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+  },
+  {
+    id: 'loc-2',
+    itemName: 'Kính đọc sách gọng đồi mồi',
+    location: 'Tủ đầu giường cạnh cửa sổ phòng ngủ',
+    note: 'Đặt ngay bên cạnh cốc trà sứ trắng',
+    photoUrl: '/src/assets/images/item_reading_glasses_1795772705367.jpg',
+    updatedAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+  },
+  {
+    id: 'loc-3',
+    itemName: 'Ví da nâu & thẻ BHYT / CCCD',
+    location: 'Khay gốm trên bàn gỗ ngay cửa ra vào',
+    note: 'Để chung khay để tiện lấy trước khi bước ra khỏi nhà',
+    photoUrl: '/src/assets/images/item_wallet_cards_1795772703801.jpg',
+    updatedAt: new Date(Date.now() - 3600000 * 9).toISOString(),
+  },
+];
