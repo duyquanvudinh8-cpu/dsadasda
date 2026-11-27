@@ -83,16 +83,16 @@ object VietnameseVoiceParser {
             else -> RepeatType.ONCE
         }
 
-        val isTomorrow = Regex("(ngày mai|mai\\b)", RegexOption.IGNORE_CASE).containsMatchIn(text)
+        val isTomorrow = Regex("(ngày mai|mai\\\\b)", RegexOption.IGNORE_CASE).containsMatchIn(text)
         if (isTomorrow) {
-            text = text.replace(Regex("(vào\\s+)?ngày mai", RegexOption.IGNORE_CASE), " ")
+            text = text.replace(Regex("(vào\\\\s+)?ngày mai", RegexOption.IGNORE_CASE), " ")
         }
 
         var hour: Int? = null
         var minute = 0
 
         // 1. Thời gian tương đối: "sau 15 phút"
-        val relMin = Regex("sau\\s+(\\d{1,3})\\s*(phút|phut|p)", RegexOption.IGNORE_CASE).find(text)
+        val relMin = Regex("sau\\\\s+(\\\\d{1,3})\\\\s*(phút|phut|p)", RegexOption.IGNORE_CASE).find(text)
         if (relMin != null) {
             val mins = relMin.groupValues[1].toLongOrNull()?.coerceIn(1, 720) ?: 10L
             val target = now.plusMinutes(mins)
@@ -102,7 +102,7 @@ object VietnameseVoiceParser {
         } else {
             // 2. Thời gian tuyệt đối: "lúc 7 giờ tối", "8h30 sáng", "7 giờ rưỡi tối"
             val absRegex = Regex(
-                "(?:vào\\s+lúc|lúc|vào)?\\s*(\\d{1,2})\\s*(?:giờ|gio|h|:)\\s*(?:(rưỡi|ruoi)|(\\d{1,2})\\s*(?:phút|phut)?)?\\s*(sáng|trưa|chiều|tối|đêm)?",
+                "(?:vào\\\\s+lúc|lúc|vào)?\\\\s*(\\\\d{1,2})\\\\s*(?:giờ|gio|h|:)\\\\s*(?:(rưỡi|ruoi)|(\\\\d{1,2})\\\\s*(?:phút|phut)?)?\\\\s*(sáng|trưa|chiều|tối|đêm)?",
                 RegexOption.IGNORE_CASE
             )
             val match = absRegex.find(text)
@@ -132,8 +132,8 @@ object VietnameseVoiceParser {
         val finalMinute = if (hour != null) minute else fallback.minute
 
         val cleanedTitle = text
-            .replace(Regex("^(hãy\\s+)?(nhắc\\s+(tôi|mình|giúp|nhớ)?|nhớ\\s+)", RegexOption.IGNORE_CASE), "")
-            .replace(Regex("\\s+"), " ")
+            .replace(Regex("^(hãy\\\\s+)?(nhắc\\\\s+(tôi|mình|giúp|nhớ)?|nhớ\\\\s+)", RegexOption.IGNORE_CASE), "")
+            .replace(Regex("\\\\s+"), " ")
             .trim(' ', ',', '.', '-', ':')
             .ifEmpty { original.ifEmpty { "Việc cần nhớ" } }
             .replaceFirstChar { it.uppercase() }

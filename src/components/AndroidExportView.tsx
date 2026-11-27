@@ -134,13 +134,19 @@ export function AndroidExportView({ t }: AndroidExportViewProps) {
           </div>
           <h2 className="text-base font-bold">Cách 1 (Khuyên dùng): Tạo APK tự động trên GitHub</h2>
           <p className="text-sm text-[#526762] dark:text-[#9BB2AD] leading-relaxed">
-            <strong>Không cần cài Android Studio.</strong> File ZIP đã cài sẵn{' '}
+            <strong>Không cần cài Android Studio.</strong> Tải file ZIP lên 1 repo GitHub mới (không cần giải nén), tạo tệp{' '}
             <code className="font-mono-num text-xs bg-[#EFF4F2] dark:bg-[#223033] px-1.5 py-0.5 rounded">
               .github/workflows/build-apk.yml
-            </code>
-            . Chỉ cần đẩy mã nguồn lên 1 repo GitHub mới → mở tab <strong>Actions</strong> → chờ ~3 phút rồi tải{' '}
-            <strong>NhoGiup-Debug-APK</strong> ở mục <strong>Artifacts</strong>.
+            </code>{' '}
+            → mở tab <strong>Actions</strong> chờ ~3 phút rồi tải <strong>NhoGiup-Debug-APK</strong>.
           </p>
+          <button
+            type="button"
+            onClick={() => setSelectedPath('.github/workflows/build-apk.yml')}
+            className="text-xs font-bold text-[#0F766E] dark:text-[#2DD4BF] hover:underline pt-1"
+          >
+            Xem & sao chép build-apk.yml →
+          </button>
         </div>
 
         <div className="rounded-3xl p-6 bg-white dark:bg-[#161F21] border border-[#DCE5E2] dark:border-[#273538] space-y-2.5">

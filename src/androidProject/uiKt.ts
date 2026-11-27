@@ -438,7 +438,7 @@ class MainActivity : ComponentActivity() {
             val activeChecklistId = selectedChecklistId ?: checklists.firstOrNull()?.id
             val checklistItems by remember(activeChecklistId) {
                 if (activeChecklistId != null) db.checklistDao().observeItems(activeChecklistId)
-                else kotlinx.coroutines.flow.flowOf(emptyList())
+                else kotlinx.coroutines.flow.flowOf(emptyList<ChecklistItemEntity>())
             }.collectAsState(initial = emptyList())
 
             NhoGiupTheme(

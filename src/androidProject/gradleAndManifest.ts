@@ -26,6 +26,28 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      - name: Auto-unzip & locate Android project folder
+        id: locate
+        shell: bash
+        run: |
+          set -e
+          SETTINGS_FILE=$(find . -maxdepth 4 -name "settings.gradle.kts" | head -n 1 || true)
+          if [ -z "$SETTINGS_FILE" ]; then
+            ZIP_FILE=$(find . -maxdepth 3 -name "*.zip" | head -n 1 || true)
+            if [ -n "$ZIP_FILE" ]; then
+              echo "Found ZIP archive: $ZIP_FILE — extracting..."
+              unzip -o "$ZIP_FILE" -d ./unzipped_project
+              SETTINGS_FILE=$(find ./unzipped_project -maxdepth 4 -name "settings.gradle.kts" | head -n 1 || true)
+            fi
+          fi
+          if [ -z "$SETTINGS_FILE" ]; then
+            echo "::error::Khong tim thay settings.gradle.kts! Hay tai file nho-giup-android-project.zip len repo GitHub nay roi chay lai Actions."
+            exit 1
+          fi
+          PROJECT_DIR=$(dirname "$SETTINGS_FILE")
+          echo "Detected Android project at: $PROJECT_DIR"
+          echo "dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -38,23 +60,34 @@ jobs:
           gradle-version: '8.9'
 
       - name: Build Debug APK
+        working-directory: \${{ steps.locate.outputs.dir }}
         run: gradle assembleDebug --no-daemon
 
-      - name: Build Unsigned Release APK
-        run: gradle assembleRelease --no-daemon
+      - name: Prepare APK artifact
+        shell: bash
+        run: |
+          mkdir -p dist-apk
+          cp "\${{ steps.locate.outputs.dir }}"/app/build/outputs/apk/debug/*.apk dist-apk/NhoGiup-debug.apk
+          ls -lh dist-apk/
 
       - name: Upload NhoGiup Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: NhoGiup-Debug-APK
-          path: app/build/outputs/apk/debug/*.apk
+          path: dist-apk/NhoGiup-debug.apk
           if-no-files-found: error
 
-      - name: Upload NhoGiup Release APK
+      - name: Build Unsigned Release APK (Optional)
+        continue-on-error: true
+        working-directory: \${{ steps.locate.outputs.dir }}
+        run: gradle assembleRelease --no-daemon
+
+      - name: Upload NhoGiup Release APK (Optional)
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: NhoGiup-Release-APK
-          path: app/build/outputs/apk/release/*.apk
+          path: \${{ steps.locate.outputs.dir }}/app/build/outputs/apk/release/*.apk
           if-no-files-found: warn
 `,
   },
@@ -437,12 +470,12 @@ dependencies {
     content: `# Nhớ Giúp — Hướng dẫn Tạo File APK & Cài Lên Điện Thoại
 
 ## CÁCH 1 (Nhanh nhất — KHÔNG cần cài Android Studio): Build APK tự động trên GitHub Actions (Miễn phí)
-Dự án đã có sẵn tệp \`.github/workflows/build-apk.yml\`.
-1. Giải nén file \`nho-giup-android-project.zip\`.
-2. Đăng nhập [github.com](https://github.com) → tạo 1 kho lưu trữ mới (ví dụ \`nho-giup-android\`).
-3. Tải toàn bộ thư mục bên trong \`nho-giup-android/\` lên kho lưu trữ (bao gồm thư mục ẩn \`.github/workflows/build-apk.yml\`).
-4. Mở tab **Actions** trên GitHub → chọn workflow **Build NhoGiup Android APK** → chờ khoảng 2–3 phút để máy chủ tự biên dịch.
-5. Nhấn vào mục **Artifacts** bên dưới → tải **NhoGiup-Debug-APK** về máy tính hoặc thẳng về điện thoại Android, giải nén ra \`app-debug.apk\` và cài đặt ngay!
+Dự án đã có sẵn tệp \`.github/workflows/build-apk.yml\` tự động giải nén ZIP và tự tìm thư mục dự án.
+1. Đăng nhập [github.com](https://github.com) → tạo 1 kho lưu trữ mới (ví dụ \`nho-giup-android\`).
+2. Tải thẳng file \`nho-giup-android-project.zip\` lên kho lưu trữ (**Add file → Upload files**), không cần giải nén thủ công.
+3. Tạo tệp \`.github/workflows/build-apk.yml\` (**Add file → Create new file**) rồi dán nội dung \`build-apk.yml\` từ mục **Xuất APK** → bấm **Commit changes**.
+4. Mở tab **Actions** trên GitHub → bấm vào lượt chạy **Build NhoGiup Android APK** → chờ khoảng 2–3 phút để hiện dấu tích xanh.
+5. Kéo xuống mục **Artifacts** → tải **NhoGiup-Debug-APK** về máy tính hoặc thẳng về điện thoại Android, giải nén ra \`NhoGiup-debug.apk\` và cài đặt ngay!
 
 ---
 

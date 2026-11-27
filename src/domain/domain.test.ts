@@ -129,4 +129,27 @@ test('Android project bundle includes CI APK workflow, adaptive icons, and all 4
   for (const file of ALL_ANDROID_SOURCE_FILES) {
     assert.ok(file.content.trim().length > 20, `File ${file.path} should not be empty`);
   }
+
+  // Verify VietnameseVoiceParser.kt emits valid Kotlin double-escaped regex tokens (\\s, \\d, \\b)
+  const parserKt = ALL_ANDROID_SOURCE_FILES.find((f) => f.path.endsWith('VietnameseVoiceParser.kt'));
+  assert.ok(parserKt, 'Missing VietnameseVoiceParser.kt');
+  assert.ok(parserKt.content.includes('\\\\s+'), 'Expected double-escaped \\\\s+ in Kotlin Regex');
+  assert.ok(parserKt.content.includes('\\\\d{1,3}'), 'Expected double-escaped \\\\d{1,3} in Kotlin Regex');
+  assert.ok(parserKt.content.includes('mai\\\\b'), 'Expected double-escaped \\\\b in Kotlin Regex');
+
+  // Verify NO Kotlin file has illegal single-backslash regex escapes (\s, \d, \w) in regular strings
+  for (const ktFile of ALL_ANDROID_SOURCE_FILES.filter((f) => f.language === 'kotlin')) {
+    assert.equal(
+      /(?<!\\)\\[sdw]/.test(ktFile.content),
+      false,
+      `Found illegal single-backslash escape (\\s, \\d, or \\w) in ${ktFile.path}`
+    );
+  }
+
+  // Verify build-apk.yml supports auto-unzipping uploaded ZIPs and valid GitHub Actions expressions
+  const workflowYml = ALL_ANDROID_SOURCE_FILES.find((f) => f.path === '.github/workflows/build-apk.yml');
+  assert.ok(workflowYml, 'Missing build-apk.yml');
+  assert.ok(workflowYml.content.includes('unzip -o'), 'Workflow should auto-unzip uploaded ZIP archives');
+  assert.ok(workflowYml.content.includes('${{ steps.locate.outputs.dir }}'), 'Workflow should preserve ${{ ... }} expression');
 });
+
